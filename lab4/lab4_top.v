@@ -18,7 +18,26 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module lab4_top(input clk, output reg mhz25_clk_out);
+module lab4_top(
+	/////////////////////////////////////////
+	//INPUTS
+	/////////////////////////////////////////
+	input clk, 
+	
+	//buttons
+	input btnU,
+	input btnD,
+	input btnL,
+	input btnR,
+	input btnS,		//reset button (middle)
+	
+	/////////////////////////////////////////
+	//OUTPUTS
+	/////////////////////////////////////////
+	output reg mhz25_clk_out
+	);
+	
+	//Create the pixel clock
 	reg [26:0] mhz25_ctr;
 
 	initial
@@ -30,5 +49,20 @@ module lab4_top(input clk, output reg mhz25_clk_out);
 		if (mhz25_ctr == 2)
 			mhz25_clk_out = ~mhz25_clk_out;
 	end
+	
+	//Debounce the buttons
+	reg up;
+	reg down;
+	reg left;
+	reg right;
+	reg reset;
+	debouncer du (.clk(clk), .btn(btnU), .debounced(up));
+	debouncer dd (.clk(clk), .btn(btnD), .debounced(down));
+	debouncer dl (.clk(clk), .btn(btnL), .debounced(left));
+	debouncer dr (.clk(clk), .btn(btnR), .debounced(right));
+	debouncer ds (.clk(clk), .btn(btnR), .debounced(reset));
+	
+	//movement
+	movement mv (.clk(clk), .btnU(up), .btnD(down), .btnL(left), .btnR(right));
 	
 endmodule
