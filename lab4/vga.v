@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date:    14:40:50 11/14/2019 
+// Create Date:    15:03:58 11/14/2019 
 // Design Name: 
-// Module Name:    lab4_one 
+// Module Name:    vga 
 // Project Name: 
 // Target Devices: 
 // Tool versions: 
@@ -18,22 +18,6 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module lab4_top(input clk, 
-				output reg mhz25_clk_out,
-    );
-	reg [26:0] mhz25_ctr;
-	
-	initial begin
-		mhz25_ctr = 0;
-	end
-	
-	always @ posedge(clk) begin
-		mhz25_ctr <= mhz25_ctr + 1;
-		if (mhz25_ctr == 2)
-			mhz25_clk_out = ~mhz25_clk_out;
-	end
-endmodule
-
 module hvsync_generator(
     input clk,
     output Hsync,
