@@ -64,31 +64,3 @@ module hvsync_generator(
 
 endmodule
 
-module VGADemo(
-    input mhz25_clk, output reg [2:0] pixel, output hsync_out, output vsync_out
-);
-    wire inDisplayArea;
-    wire [9:0] CounterX;
-
-    hvsync_generator hvsync(
-      .clk(mhz25_clk),
-      .Hsync(hsync_out),
-      .Vsync(vsync_out),
-      .CounterX(CounterX),
-      //.CounterY(CounterY),
-      .inDisplayArea(inDisplayArea)
-    );
-
-    always @(posedge mhz25_clk)
-    begin
-      if (inDisplayArea)
-        pixel <= 3'b111;
-      else // if it's not to display, go dark
-        pixel <= 3'b000;
-    end
-
-endmodule
-
-module lab4_display(
-					output reg [2:0] vgaR, output reg [2:0] vgaG, output reg [1:0] vgaB);
-endmodule
