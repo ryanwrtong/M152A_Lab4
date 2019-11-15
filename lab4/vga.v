@@ -82,7 +82,7 @@ module VGADemo(
     always @(posedge mhz25_clk)
     begin
       if (inDisplayArea)
-        pixel <= CounterX[9:6];
+        pixel <= 3'b111;
       else // if it's not to display, go dark
         pixel <= 3'b000;
     end
