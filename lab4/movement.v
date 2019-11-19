@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module movement (input clk, input btnU, input btnD, input btnL, input btnR, input rst, output xpos, output ypos
+module movement (input clk, input btnU, input btnD, input btnL, input btnR, input rst, output reg xpos, output reg ypos
     );
     parameter START_XPOS = 1;
     parameter START_YPOS = 1;
@@ -12,19 +12,19 @@ module movement (input clk, input btnU, input btnD, input btnL, input btnR, inpu
 
     always @ (posedge clk) begin
         if (rst) begin
-            xpos = START_XPOS;
-            ypos = START_YPOS;
+            xpos <= START_XPOS;
+            ypos <= START_YPOS;
         end
         else begin
         //TODO: check valid move
             if (btnU)
-                ypos = ypos - 1;
+                ypos <= ypos - 1;
             else if (btnD)
-                ypos = ypos + 1;
+                ypos <= ypos + 1;
             else if (btnL)
-                xpos = xpos - 1;
+                xpos <= xpos - 1;
             else if (btnR)
-                xpos = xpos + 1;
+                xpos <= xpos + 1;
         end
     end
 

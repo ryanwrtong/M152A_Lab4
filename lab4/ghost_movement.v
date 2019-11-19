@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module ghost_movement (input clk, input rst, output xpos, output ypos
+module ghost_movement (input clk, input rst, output reg xpos, output reg ypos
     );
 
     parameter UP = 4'b0001;
@@ -19,21 +19,21 @@ module ghost_movement (input clk, input rst, output xpos, output ypos
 
     always @ (posedge clk) begin
         if (rst) begin
-            xpos = GHOST_START_XPOS;
-            ypos = GHOST_START_YPOS;
+            xpos <= GHOST_START_XPOS;
+            ypos <= GHOST_START_YPOS;
             curdir = 0;
         end
         else begin
           //TODO: check if valid move
           //TODO: generate random direction to go
             if (curdir == UP)
-                ypos = ypos - 1;
+                ypos <= ypos - 1;
             else if (curdir == DOWN)
-                ypos = ypos + 1;
+                ypos <= ypos + 1;
             else if (curdir == LEFT)
-                xpos = xpos - 1;
+                xpos <= xpos - 1;
             else if (curdir == RIGHT)
-                xpos = xpos + 1;
+                xpos <= xpos + 1;
         end
     end
 
