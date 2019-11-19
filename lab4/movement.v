@@ -2,19 +2,21 @@
 
 module movement (input clk, input btnU, input btnD, input btnL, input btnR, input rst, output xpos, output ypos
     );
+    parameter START_XPOS = 1;
+    parameter START_YPOS = 1;
 
     initial begin
-        xpos = 1;   //STARTING POSITION X
-        ypos = 1;   //STARTING POSITION Y
+        xpos = START_XPOS;   //STARTING POSITION X
+        ypos = START_YPOS;   //STARTING POSITION Y
     end
 
-    reg [3:0] curdir;
     always @ (posedge clk) begin
         if (rst) begin
-            xpos = 1;
-            ypos = 1;
+            xpos = START_XPOS;
+            ypos = START_YPOS;
         end
         else begin
+        //TODO: check valid move
             if (btnU)
                 ypos = ypos - 1;
             else if (btnD)

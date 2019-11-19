@@ -35,10 +35,20 @@ module lab4_top(
 	debouncer dr (.clk(clk), .btn(btnR), .debounced(right));
 	debouncer ds (.clk(clk), .btn(btnR), .debounced(reset));
 
-	//Movement Handler
+	//Player Movement Handler
+	reg [9:0] xpos;
+	reg [9:0] ypos;
 	// outputs x and y position to be displayed in map
 	movement mv (.clk(clk), .btnU(up), .btnD(down), .btnL(left), .btnR(right),
 		.rst(reset), .xpos(xpos), .ypos(ypos));
 
+	//Ghost Movement Handler
+	reg [9:0] ghost_xpos;
+	reg [9:0] ghost_ypos;
+	ghost_movement gmv (.clk(clk), .rst(reset), .xpos(ghost_xpos), .ypos(ghost_ypos))
+
+
+	//Scoring
+	//TODO: connect scoring, add reset to scoring
 
 endmodule
