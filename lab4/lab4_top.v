@@ -1,55 +1,28 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    14:40:50 11/14/2019 
-// Design Name: 
-// Module Name:    lab4_one 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
-//
-// Dependencies: 
-//
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
-//
-//////////////////////////////////////////////////////////////////////////////////
+
 module lab4_top(
-	/////////////////////////////////////////
-	//INPUTS
-	/////////////////////////////////////////
-	input clk, 
-	
-	//buttons
+	input clk,
 	input btnU,
 	input btnD,
 	input btnL,
 	input btnR,
 	input btnS,		//reset button (middle)
-	
-	/////////////////////////////////////////
-	//OUTPUTS
-	/////////////////////////////////////////
 	output reg mhz25_clk_out
 	);
-	
+
 	//Create the pixel clock
 	reg [26:0] mhz25_ctr;
 
 	initial
 		mhz25_ctr = 0;
-	
+
 	always @ (posedge clk)
 	begin
 		mhz25_ctr = mhz25_ctr + 1;
 		if (mhz25_ctr == 2)
 			mhz25_clk_out = ~mhz25_clk_out;
 	end
-	
+
 	//Debounce the buttons
 	reg up;
 	reg down;
@@ -61,8 +34,11 @@ module lab4_top(
 	debouncer dl (.clk(clk), .btn(btnL), .debounced(left));
 	debouncer dr (.clk(clk), .btn(btnR), .debounced(right));
 	debouncer ds (.clk(clk), .btn(btnR), .debounced(reset));
-	
-	//movement
-	movement mv (.clk(clk), .btnU(up), .btnD(down), .btnL(left), .btnR(right));
-	
+
+	//Movement Handler
+	// outputs x and y position to be displayed in map
+	movement mv (.clk(clk), .btnU(up), .btnD(down), .btnL(left), .btnR(right),
+		.rst(reset), .xpos(xpos), .ypos(ypos));
+
+
 endmodule

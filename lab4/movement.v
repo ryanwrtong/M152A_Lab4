@@ -1,26 +1,29 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    15:20:06 11/14/2019 
-// Design Name: 
-// Module Name:    movement 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
-//
-// Dependencies: 
-//
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
-//
-//////////////////////////////////////////////////////////////////////////////////
-module movement(input clk, input btnU, input btnD, input btnL, input btnR 
+
+module movement (input clk, input btnU, input btnD, input btnL, input btnR, input rst, output xpos, output ypos
     );
-	
-	
+
+    initial begin
+        xpos = 1;   //STARTING POSITION X
+        ypos = 1;   //STARTING POSITION Y
+    end
+
+    reg [3:0] curdir;
+    always @ (posedge clk) begin
+        if (rst) begin
+            xpos = 1;
+            ypos = 1;
+        end
+        else begin
+            if (btnU)
+                ypos = ypos - 1;
+            else if (btnD)
+                ypos = ypos + 1;
+            else if (btnL)
+                xpos = xpos - 1;
+            else if (btnR)
+                xpos = xpos + 1;
+        end
+    end
 
 endmodule
