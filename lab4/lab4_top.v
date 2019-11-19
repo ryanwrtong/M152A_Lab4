@@ -1,125 +1,48 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    14:40:50 11/14/2019 
-// Design Name: 
-// Module Name:    lab4_one 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
-//
-// Dependencies: 
-//
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
-//
-//////////////////////////////////////////////////////////////////////////////////
-module lab4_top(input clk, output reg mhz25_clk_out);
-	reg [26:0] mhz25_ctr;
-
-	initial
-		mhz25_ctr = 0;
-	
-	always @ (posedge clk)
-	begin
-		mhz25_ctr = mhz25_ctr + 1;
-		if (mhz25_ctr == 2)
-			mhz25_clk_out = ~mhz25_clk_out;
-	end
-	
-endmodule
-
-module mojo_top(
-    // 50MHz clock input
-    input clk,
-    // Input from reset button (active low)
-    input rst_n,
-    // cclk input from AVR, high when AVR is ready
-    input cclk,
-    // Outputs to the 8 onboard LEDs
-    output[7:0]led,
-    // AVR SPI connections
-    output spi_miso,
-    input spi_ss,
-    input spi_mosi,
-    input spi_sck,
-    // AVR ADC channel select
-    output [3:0] spi_channel,
-    // Serial connections
-    input avr_tx, // AVR Tx => FPGA Rx
-    output avr_rx, // AVR Rx => FPGA Tx
-    input avr_rx_busy, // AVR Rx buffer full
-
-    // VGA connections
-    output reg [2:0] pixelR,
-    output reg [2:0] pixelG,
-    output reg [2:0] pixelB,
-    output Hsync,
-    output Vsync
+module top(
+    input wire clk,             // board clock: 100 MHz on Arty/Basys3/Nexys
+    input wire RST_BTN,         // reset button
+    output wire Hsync,       // horizontal sync output
+    output wire Vsync,       // vertical sync output
+    output wire [2:0] vgaRed,    // 3-bit VGA red output
+    output wire [2:0] vgaGreen,    // 3-bit VGA green output
+    output wire [1:0] vgaBlue     // 3-bit VGA blue output
     );
 
-wire clk_25;
-wire rst = ~rst_n; // make reset active high
-wire inDisplayArea;
-wire [9:0] CounterX;
-wire [8:0] CounterY;
-wire [3:0] selector;
+    //wire rst = ~RST_BTN;    // reset is active low on Arty & Nexys Video
+    wire rst = RST_BTN;  // reset is active high on Basys3 (BTNC)
 
-clk_25MHz clk_video(
-  .CLK_IN1(clk),
-  .CLK_OUT1(clk_25),
-  .RESET(rst)
-);
+    // generate a 25 MHz pixel strobe
+    reg [15:0] cnt;
+    reg pix_stb;
+    always @(posedge clk)
+        {pix_stb, cnt} <= cnt + 16'h4000;  // divide by 4: (2^16)/4 = 0x4000
 
-hvsync_generator hvsync(
-  .clk(clk_25),
-  .Hsync(hsync_out),
-  .Vsync(vsync_out),
-  .CounterX(CounterX),
-  .CounterY(CounterY),
-  .inDisplayArea(inDisplayArea)
-);
+    wire [9:0] x;  // current pixel x position: 10-bit value: 0-1023
+    wire [8:0] y;  // current pixel y position:  9-bit value: 0-511
 
+    vga640x480 display (
+        .i_clk(clk),
+        .i_pix_stb(pix_stb),
+        .i_rst(rst),
+        .o_hs(Hsync), 
+        .o_vs(Vsync), 
+        .o_x(x), 
+        .o_y(y)
+    );
 
-// these signals should be high-z when not used
-assign spi_miso = 1'bz;
-assign avr_rx = 1'bz;
-assign spi_channel = 4'bzzzz;
+    // Four overlapping squares
+    wire sq_a, sq_b, sq_c, sq_d;
+    assign sq_a = ((x > 120) & (y >  40) & (x < 280) & (y < 200)) ? 1 : 0;
+    assign sq_b = ((x > 200) & (y > 120) & (x < 360) & (y < 280)) ? 1 : 0;
+    assign sq_c = ((x > 280) & (y > 200) & (x < 440) & (y < 360)) ? 1 : 0;
+    assign sq_d = ((x > 360) & (y > 280) & (x < 520) & (y < 440)) ? 1 : 0;
 
-assign led = 8'b10101010;
-
-// use this bits from CounterX to divide the
-// horizontal screen in strips 64 bytes wide
-assign selector = CounterX[9:6];
-
-always @(posedge clk_25)
-begin
-  if (inDisplayArea) begin
-      /*
-       * I don't know if there is a smarter way to assign
-       * only one color for strip.
-       *
-       * Maybe using the selector signal as index?
-       */
-      pixelR[2] <= selector == 4'b0000;
-      pixelR[1] <= selector == 4'b0001;
-      pixelR[0] <= selector == 4'b0010;
-      pixelG[2] <= selector == 4'b0011;
-      pixelG[1] <= selector == 4'b0100;
-      pixelG[0] <= selector == 4'b0101;
-      pixelB[2] <= selector == 4'b0110;
-      pixelB[1] <= selector == 4'b0111;
-      pixelB[0] <= selector == 4'b1000;
-  end
-  else begin// if it's not to display, go dark
-      pixelR <= 3'b000;
-      pixelG <= 3'b000;
-      pixelB <= 3'b000;
-  end
-end
-
+    assign vgaRed[2:2] = sq_b;         // square b is red
+	assign vgaRed[1:1] = sq_b;
+	assign vgaRed[0:0] = sq_b;
+    assign vgaGreen[2:2] = sq_a | sq_d;  // squares a and d are green
+	assign vgaGreen[1:1] = sq_a | sq_d;
+	assign vgaGreen[0:0] = sq_a | sq_d;        // square c is blue
+	assign vgaBlue[1:1] = sq_c;
+	assign vgaBlue[0:0] = sq_c; 
 endmodule
