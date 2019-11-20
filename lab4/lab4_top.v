@@ -1,6 +1,6 @@
 module top(
     input wire clk,             // board clock: 100 MHz on Arty/Basys3/Nexys
-    input wire RST_BTN,         // reset button
+    //input wire RST_BTN,         // reset button
     output wire Hsync,       // horizontal sync output
     output wire Vsync,       // vertical sync output
     output wire [2:0] vgaRed,    // 3-bit VGA red output
@@ -9,7 +9,7 @@ module top(
     );
 
     //wire rst = ~RST_BTN;    // reset is active low on Arty & Nexys Video
-    wire rst = RST_BTN;  // reset is active high on Basys3 (BTNC)
+    wire rst = 0;  // reset is active high on Basys3 (BTNC)
 
     // generate a 25 MHz pixel strobe
     reg [15:0] cnt;
@@ -40,9 +40,10 @@ module top(
     assign vgaRed[2:2] = sq_b;         // square b is red
 	assign vgaRed[1:1] = sq_b;
 	assign vgaRed[0:0] = sq_b;
-    assign vgaGreen[2:2] = sq_a | sq_d;  // squares a and d are green
-	assign vgaGreen[1:1] = sq_a | sq_d;
-	assign vgaGreen[0:0] = sq_a | sq_d;        // square c is blue
-	assign vgaBlue[1:1] = sq_c;
+    assign vgaGreen[2] = sq_d;  // squares a and d are green
+	assign vgaGreen[1] = sq_d;
+	assign vgaGreen[0] = sq_d;
+	assign vgaBlue[1:1] = sq_c;        // square c is blue
 	assign vgaBlue[0:0] = sq_c; 
 endmodule
+
