@@ -20,7 +20,7 @@ TIMESPEC TS_sys_clk_pin = PERIOD sys_clk_pin 100000 kHz;
 #NET "RamUB"          LOC = "K15" | IOSTANDARD = "LVCMOS33";   #Bank = 1, Pin name = IO_L41P_GCLK9_IRDY1_M1RASN,        Sch name = MT-UB
 #NET "RamWait"        LOC = "V4"  | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L63N,                           Sch name = P30-WAIT
 
-#NET "FlashRp"        LOC = "T4"  | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L63P,                           Sch name = P30-RST
+#NET "FlashRp"        LOC = "T4"  | IOSTANDARD = "LVCMOS33";   #Bank = 2, Pin name = IO_L63P,                           Sch name = P30-
 #NET "FlashCS"        LOC = "L17" | IOSTANDARD = "LVCMOS33";   #Bank = 1, Pin name = IO_L46P_FCS_B_M1DQ2,               Sch name = P30-CE
 
 #NET "QuadSpiFlashCS"    LOC="V3"  | IOSTANDARD = "LVCMOS33";  #Bank = MISC, Pin name = IO_L65N_CSO_B_2,                Sch name = CS
@@ -125,8 +125,8 @@ NET "vgaRed<2>"      LOC = "N7"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin na
 NET "vgaGreen<0>"    LOC = "P8"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L44N,                          Sch name = GRN0
 NET "vgaGreen<1>"    LOC = "T6"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L45P,                          Sch name = GRN1
 NET "vgaGreen<2>"    LOC = "V6"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L45N,                          Sch name = GRN2
-NET "vgaBlue<1>"     LOC = "R7"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L46P,                          Sch name = BLU1
-NET "vgaBlue<2>"     LOC = "T7"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L46N,                          Sch name = BLU2
+NET "vgaBlue<0>"     LOC = "R7"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L46P,                          Sch name = BLU1
+NET "vgaBlue<1>"     LOC = "T7"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L46N,                          Sch name = BLU2
 
 NET "Hsync"          LOC = "N6"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L47P,                          Sch name = HSYNC
 NET "Vsync"          LOC = "P7"  | IOSTANDARD = "LVCMOS33";   # Bank = 2, Pin name = IO_L47N,                          Sch name = VSYNC
