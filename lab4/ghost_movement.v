@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module ghost_movement (input clk, input rst, output reg xpos, output reg ypos
+module ghost_movement (input clk, input reset, output reg xpos, output reg ypos
     );
 
     parameter UP = 4'b0001;
@@ -18,7 +18,7 @@ module ghost_movement (input clk, input rst, output reg xpos, output reg ypos
     end
 
     always @ (posedge clk) begin
-        if (rst) begin
+        if (reset) begin
             xpos <= GHOST_START_XPOS;
             ypos <= GHOST_START_YPOS;
             curdir = 0;

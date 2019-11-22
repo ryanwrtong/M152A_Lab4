@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module movement (input clk, input btnU, input btnD, input btnL, input btnR, input rst, output reg xpos, output reg ypos
+module movement (input clk, input btnU, input btnD, input btnL, input btnR, input reset, output reg xpos, output reg ypos
     );
     parameter START_XPOS = 1;
     parameter START_YPOS = 1;
@@ -11,7 +11,7 @@ module movement (input clk, input btnU, input btnD, input btnL, input btnR, inpu
     end
 
     always @ (posedge clk) begin
-        if (rst) begin
+        if (reset) begin
             xpos <= START_XPOS;
             ypos <= START_YPOS;
         end

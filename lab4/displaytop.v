@@ -1,5 +1,7 @@
 module displaytop(
     input wire clk,             // board clock: 100 MHz on Arty/Basys3/Nexys
+//	input wire [9:0] x,
+//	input wire [8:0] y,
     //input wire RST_BTN,         // reset button
     output wire Hsync,       // horizontal sync output
     output wire Vsync,       // vertical sync output
@@ -8,8 +10,7 @@ module displaytop(
     output wire [1:0] vgaBlue     // 3-bit VGA blue output
     );
 
-    //wire rst = ~RST_BTN;    // reset is active low on Arty & Nexys Video
-    wire rst = 0;  // reset is active high on Basys3 (BTNC)
+    wire rst = 0; //~RST_BTN;    // reset is active low on Arty & Nexys Video
 
     // generate a 25 MHz pixel strobe
     reg [15:0] cnt;
@@ -31,19 +32,29 @@ module displaytop(
     );
 
     // Four overlapping squares
-    wire sq_a, sq_b, sq_c, sq_d;
-    assign sq_a = ((x > 120) & (y >  40) & (x < 280) & (y < 200)) ? 1 : 0;
-    assign sq_b = ((x > 200) & (y > 120) & (x < 360) & (y < 280)) ? 1 : 0;
-    assign sq_c = ((x > 280) & (y > 200) & (x < 440) & (y < 360)) ? 1 : 0;
-    assign sq_d = ((x > 360) & (y > 280) & (x < 520) & (y < 440)) ? 1 : 0;
+    /*wire blockArr [8:0][9:0];
+	genvar Yindex;
+	genvar Xindex;
+	generate
+		for(Yindex=0; Yindex<9; Yindex=Yindex+1) begin
+			for(Xindex=0; Xindex<10; Xindex=Xindex+1) begin
+				assign blockArr[Yindex][Xindex] = (2 > 1) ? 1 : 0; //((x > 20+(30*Xindex)) & (y > 20+(30*Yindex)) & (x < 50+(30*Xindex)) & (y < 50+(30*Yindex))) ? 1 : 0;
+				
+			end
+		end
+	endgenerate*/
+    assign grid = ((((x > 20) & (x < 40)) | ((y >  20) & (y < 40)) | ((x > 400) & (x < 420)) | ((y > 400) & (y < 420))) & (x > 20) & (y > 20) &(x < 420) & (y < 420)) ? 1 : 0;
+    /*assign sq_b = ((x > 120) & (y > 120) & (x < 220) & (y < 220)) ? 1 : 0;
+    assign sq_c = ((x > 220) & (y > 200) & (x < 320) & (y < 320)) ? 1 : 0;
+    assign sq_d = ((x > 320) & (y > 280) & (x < 420) & (y < 420)) ? 1 : 0;*/
 
-    assign vgaRed[2:2] = sq_b;         // square b is red
-	assign vgaRed[1:1] = sq_b;
-	assign vgaRed[0:0] = sq_b;
-    assign vgaGreen[2] = sq_d;  // squares a and d are green
-	assign vgaGreen[1] = sq_d;
-	assign vgaGreen[0] = sq_d;
-	assign vgaBlue[1:1] = sq_c;        // square c is blue
-	assign vgaBlue[0:0] = sq_c; 
+    assign vgaRed[2:2] = 0;
+	assign vgaRed[1:1] = 0;
+	assign vgaRed[0:0] = 0;
+    assign vgaGreen[2] = 0;
+	assign vgaGreen[1] = 0;
+	assign vgaGreen[0] = 0;
+	assign vgaBlue[1:1] = grid;
+	assign vgaBlue[0:0] = grid;
 endmodule
 
