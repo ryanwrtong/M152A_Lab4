@@ -19,9 +19,10 @@ module lab4_top(
 
 	//Create the pixel clock
 	reg [26:0] mhz25_ctr;
-
-	initial
+	
+	initial begin
 		mhz25_ctr = 0;
+	end
 
 	always @ (posedge clk)
 	begin
@@ -45,17 +46,17 @@ module lab4_top(
 	//Player Movement Handler
 	wire [9:0] xpos;
 	wire [8:0] ypos;
-	// outputs x and y position to be displayed in map
-//	movement mv (.clk(clk), .btnU(up), .btnD(down), .btnL(left), .btnR(right),
-//		.reset(reset), .xpos(xpos), .ypos(ypos));
+	//outputs x and y position to be displayed in map
+	movement mv (.clk(clk), .btnU(up), .btnD(down), .btnL(left), .btnR(right),
+		.reset(reset), .xpos(xpos), .ypos(ypos));
 
 	//Ghost Movement Handler
 //	wire [9:0] ghost_xpos;
 //	wire [8:0] ghost_ypos;
-	//ghost_movement gmv (.clk(clk), .reset(reset), .xpos(ghost_xpos), .ypos(ghost_ypos));
+//	ghost_movement gmv (.clk(clk), .reset(reset), .xpos(ghost_xpos), .ypos(ghost_ypos));
 	
 	//Display
-	displaytop disp (.clk(clk), /*.x(xpos), .y(ypos), .RST_BTN(reset),*/ .Hsync(Hsync),
+	displaytop disp (.clk(clk), .xpos(xpos), .ypos(ypos), /*.RST_BTN(reset),*/ .Hsync(Hsync),
 					.Vsync(Vsync), .vgaRed(vgaRed), .vgaGreen(vgaGreen), .vgaBlue(vgaBlue));
 					
 	//Scoring

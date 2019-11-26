@@ -1,7 +1,7 @@
 module displaytop(
     input wire clk,             // board clock: 100 MHz on Arty/Basys3/Nexys
-//	input wire [9:0] x,
-//	input wire [8:0] y,
+	input wire [9:0] xpos,
+	input wire [8:0] ypos,
     //input wire RST_BTN,         // reset button
     output wire Hsync,       // horizontal sync output
     output wire Vsync,       // vertical sync output
@@ -44,17 +44,23 @@ module displaytop(
 		end
 	endgenerate*/
     assign grid = ((((x > 20) & (x < 40)) | ((y >  20) & (y < 40)) | ((x > 400) & (x < 420)) | ((y > 400) & (y < 420))) & (x > 20) & (y > 20) &(x < 420) & (y < 420)) ? 1 : 0;
+	assign box1 = ((x > 60) & (y > 60) & (x < 210) & (y < 210)) ? 1 : 0;
+	assign box2 = ((x > 230) & (y > 60) & (x < 380) & (y < 210)) ? 1 : 0;
+	assign box3 =  ((x > 60) & (y > 230) & (x < 210) & (y < 380)) ? 1 : 0;
+	assign box4 =  ((x > 230) & (y > 230) & (x < 380) & (y < 380)) ? 1 : 0;
     /*assign sq_b = ((x > 120) & (y > 120) & (x < 220) & (y < 220)) ? 1 : 0;
     assign sq_c = ((x > 220) & (y > 200) & (x < 320) & (y < 320)) ? 1 : 0;
     assign sq_d = ((x > 320) & (y > 280) & (x < 420) & (y < 420)) ? 1 : 0;*/
+	
+	assign pacman = ((x < xpos + 6) & (x > xpos - 6) & (y < ypos + 6) & (y > ypos - 6)) ? 1 : 0;
 
-    assign vgaRed[2:2] = 0;
-	assign vgaRed[1:1] = 0;
-	assign vgaRed[0:0] = 0;
+    assign vgaRed[2:2] = pacman;
+	assign vgaRed[1:1] = pacman;
+	assign vgaRed[0:0] = pacman;
     assign vgaGreen[2] = 0;
 	assign vgaGreen[1] = 0;
 	assign vgaGreen[0] = 0;
-	assign vgaBlue[1:1] = grid;
-	assign vgaBlue[0:0] = grid;
+	assign vgaBlue[1:1] = grid | box1 | box2 | box3 | box4;
+	assign vgaBlue[0:0] = grid | box1 | box2 | box3 | box4;
 endmodule
 
