@@ -28,7 +28,7 @@ module debouncer(input clk, input btn, output reg debounced);
 		end
 		else begin
 			ctr = ctr + 1;
-			if (ctr == 30000)
+			if (ctr == 50000)
 			begin
 				ctr = 0;
 				debounced = 1;

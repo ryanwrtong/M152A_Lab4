@@ -1,8 +1,11 @@
+`timescale 1ns / 1ps
 module displaytop(
     input wire clk,             // board clock: 100 MHz on Arty/Basys3/Nexys
-	input wire [9:0] xpos,
-	input wire [8:0] ypos,
-    //input wire RST_BTN,         // reset button
+	input wire btnU,
+	input wire btnD,
+	input wire btnL,
+	input wire btnR,
+	input wire btnS,         // reset button
     output wire Hsync,       // horizontal sync output
     output wire Vsync,       // vertical sync output
     output wire [2:0] vgaRed,    // 3-bit VGA red output
@@ -15,8 +18,9 @@ module displaytop(
     // generate a 25 MHz pixel strobe
     reg [15:0] cnt;
     reg pix_stb;
-    always @(posedge clk)
+    always @(posedge clk) begin
         {pix_stb, cnt} <= cnt + 16'h4000;  // divide by 4: (2^16)/4 = 0x4000
+	end
 
     wire [9:0] x;  // current pixel x position: 10-bit value: 0-1023
     wire [8:0] y;  // current pixel y position:  9-bit value: 0-511
@@ -31,18 +35,58 @@ module displaytop(
         .o_y(y)
     );
 
-    // Four overlapping squares
-    /*wire blockArr [8:0][9:0];
-	genvar Yindex;
-	genvar Xindex;
-	generate
-		for(Yindex=0; Yindex<9; Yindex=Yindex+1) begin
-			for(Xindex=0; Xindex<10; Xindex=Xindex+1) begin
-				assign blockArr[Yindex][Xindex] = (2 > 1) ? 1 : 0; //((x > 20+(30*Xindex)) & (y > 20+(30*Yindex)) & (x < 50+(30*Xindex)) & (y < 50+(30*Yindex))) ? 1 : 0;
-				
+	//Player Movement Handler
+	reg [9:0] xpos;
+	reg [8:0] ypos;
+	reg [26:0] mhz1_ctr;
+	reg mhz1_clk;
+	initial begin
+        xpos = 50;   //STARTING POSITION X
+        ypos = 50;   //STARTING POSITION Y
+		mhz1_ctr = 0;
+    end
+	
+	//Movement clock
+	always @ (posedge clk)
+	begin
+		mhz1_ctr = mhz1_ctr + 1;
+		if (mhz1_ctr == 5)
+			mhz1_clk = ~mhz1_clk;
+	end
+
+    always @ (posedge mhz1_clk) begin
+        if (btnS) begin
+            xpos = 50;
+            ypos = 50;
+        end
+        else begin
+			if (btnU) begin
+				if (ypos - 1 > 45)
+					ypos = ypos - 10;
 			end
-		end
-	endgenerate*/
+			else if (btnD) begin
+				if (ypos + 1 < 395)
+					ypos = ypos + 10;
+			end
+			else if (btnL) begin
+				if (xpos - 1 > 45)
+					xpos = xpos - 10;
+			end
+			else if (btnR) begin
+				if (xpos + 1 < 395)
+					xpos = xpos + 10;
+			end
+        end
+    end
+
+
+	//Ghost Movement Handler
+//	wire [9:0] ghost_xpos;
+//	wire [8:0] ghost_ypos;
+//	ghost_movement gmv (.clk(clk), .reset(reset), .xpos(ghost_xpos), .ypos(ghost_ypos));
+	
+	
+	//Draw map
     assign grid = ((((x > 20) & (x < 40)) | ((y >  20) & (y < 40)) | ((x > 400) & (x < 420)) | ((y > 400) & (y < 420))) & (x > 20) & (y > 20) &(x < 420) & (y < 420)) ? 1 : 0;
 	assign box1 = ((x > 60) & (y > 60) & (x < 210) & (y < 210)) ? 1 : 0;
 	assign box2 = ((x > 230) & (y > 60) & (x < 380) & (y < 210)) ? 1 : 0;
