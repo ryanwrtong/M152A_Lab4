@@ -40,9 +40,9 @@ module displaytop(
         .i_clk(clk),
         .i_pix_stb(pix_stb),
         .i_rst(rst),
-        .o_hs(Hsync), 
-        .o_vs(Vsync), 
-        .o_x(x), 
+        .o_hs(Hsync),
+        .o_vs(Vsync),
+        .o_x(x),
         .o_y(y)
     );
 
@@ -63,7 +63,7 @@ module displaytop(
 	score2 = 0;
 	score3 = 0;
     end
-	
+
 	//Movement clock
 	always @ (posedge clk)
 	begin
@@ -71,7 +71,7 @@ module displaytop(
 		if (mhz1_ctr == 5)
 			mhz1_clk = ~mhz1_clk;
 	end
-	
+
     always @ (posedge mhz1_clk) begin
         if (btnS) begin
             xpos = 50;
@@ -86,7 +86,7 @@ module displaytop(
 					gridVisited[xpos][ypos] = 1;
 					score0++;
 				end
-				
+
 			end
 			else if (btnD) begin
 				if (ypos + 20 < 395)
@@ -146,7 +146,7 @@ module displaytop(
 	begin
 		score3 = 9;
 	end
-	
+
 	score_0 = score0;
 	score_1 = score1;
 	score_2 = score2;
@@ -154,14 +154,14 @@ module displaytop(
         end
     end
 
-	
+
 
 	//Ghost Movement Handler
 //	wire [9:0] ghost_xpos;
 //	wire [8:0] ghost_ypos;
 //	ghost_movement gmv (.clk(clk), .reset(reset), .xpos(ghost_xpos), .ypos(ghost_ypos));
-	
-	
+
+
 	//Draw map
     assign grid = ((((x > 20) & (x < 40)) | ((y >  20) & (y < 40)) | ((x > 400) & (x < 420)) | ((y > 400) & (y < 420))) & (x > 20) & (y > 20) &(x < 420) & (y < 420)) ? 1 : 0;
 	assign box1 = ((x > 60) & (y > 60) & (x < 210) & (y < 210)) ? 1 : 0;
@@ -171,7 +171,7 @@ module displaytop(
     /*assign sq_b = ((x > 120) & (y > 120) & (x < 220) & (y < 220)) ? 1 : 0;
     assign sq_c = ((x > 220) & (y > 200) & (x < 320) & (y < 320)) ? 1 : 0;
     assign sq_d = ((x > 320) & (y > 280) & (x < 420) & (y < 420)) ? 1 : 0;*/
-	
+
 	assign pacman = ((x < xpos + 6) & (x > xpos - 6) & (y < ypos + 6) & (y > ypos - 6)) ? 1 : 0;
 
     assign vgaRed[2:2] = pacman;
