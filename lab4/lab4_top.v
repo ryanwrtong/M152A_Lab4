@@ -12,24 +12,9 @@ module lab4_top(
     output wire [2:0] vgaRed,    // 3-bit VGA red output
     output wire [2:0] vgaGreen,    // 3-bit VGA green output
     output wire [1:0] vgaBlue,     // 3-bit VGA blue output
-	output reg mhz25_clk_out,
 	output [6:0] seg,
 	output [3:0] an
 	);
-
-	//Create the pixel clock
-	reg [26:0] mhz25_ctr;
-	
-	initial begin
-		mhz25_ctr = 0;
-	end
-
-	always @ (posedge clk)
-	begin
-		mhz25_ctr = mhz25_ctr + 1;
-		if (mhz25_ctr == 2)
-			mhz25_clk_out = ~mhz25_clk_out;
-	end
 
 	//Debounce the buttons
 	wire up;
@@ -43,21 +28,11 @@ module lab4_top(
 	debouncer dr (.clk(clk), .btn(btnR), .debounced(right));
 	debouncer ds (.clk(clk), .btn(btnS), .debounced(reset));
 
-	//Player Movement Handler
-	wire [9:0] xpos;
-	wire [8:0] ypos;
-	//outputs x and y position to be displayed in map
-	movement mv (.clk(clk), .btnU(up), .btnD(down), .btnL(left), .btnR(right),
-		.reset(reset), .xpos(xpos), .ypos(ypos));
-
-	//Ghost Movement Handler
-//	wire [9:0] ghost_xpos;
-//	wire [8:0] ghost_ypos;
-//	ghost_movement gmv (.clk(clk), .reset(reset), .xpos(ghost_xpos), .ypos(ghost_ypos));
-	
 	//Display
-	displaytop disp (.clk(clk), .xpos(xpos), .ypos(ypos), /*.RST_BTN(reset),*/ .Hsync(Hsync),
-					.Vsync(Vsync), .vgaRed(vgaRed), .vgaGreen(vgaGreen), .vgaBlue(vgaBlue));
+	displaytop disp (.clk(clk), .btnU(up), .btnD(down), .btnL(left), .btnR(right),
+		.btnS(reset), .Hsync(Hsync),  .Vsync(Vsync), 
+		.vgaRed(vgaRed), .vgaGreen(vgaGreen), .vgaBlue(vgaBlue), .score_0(score_0), 
+		.score_1(score_1), .score_2(score_2), .score_3(score_3));
 					
 	//Scoring
 	wire score_0;
