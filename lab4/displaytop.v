@@ -10,11 +10,7 @@ module displaytop(
     output wire Vsync,       // vertical sync output
     output wire [2:0] vgaRed,    // 3-bit VGA red output
     output wire [2:0] vgaGreen,    // 3-bit VGA green output
-    output wire [1:0] vgaBlue,     // 3-bit VGA blue output
-	output wire score_0,
-	output wire score_1,
-	output wire score_2,
-	output wire score_3
+    output wire [1:0] vgaBlue     // 3-bit VGA blue output
     );
 
     wire rst = 0; //~RST_BTN;    // reset is active low on Arty & Nexys Video
@@ -25,13 +21,6 @@ module displaytop(
     always @(posedge clk) begin
         {pix_stb, cnt} <= cnt + 16'h4000;  // divide by 4: (2^16)/4 = 0x4000
 	end
-
-	//pellets and scoring
-	reg [17:0] gridVisited [17:0];
-	reg score0;
-	reg score1;
-	reg score2;
-	reg score3;
 
     wire [9:0] x;  // current pixel x position: 10-bit value: 0-1023
     wire [8:0] y;  // current pixel y position:  9-bit value: 0-511
@@ -49,19 +38,24 @@ module displaytop(
 	//Player Movement Handler
 	reg [9:0] xpos;
 	reg [8:0] ypos;
+	reg [9:0] g_xpos;
+	reg [8:0] g_ypos;
+	reg [9:0] g2_xpos;
+	reg [8:0] g2_ypos;
+	reg died;
 	reg [26:0] mhz1_ctr;
 	reg mhz1_clk;
+	reg tgl_gdir;
 	initial begin
         xpos = 50;   //STARTING POSITION X
         ypos = 50;   //STARTING POSITION Y
-	mhz1_ctr = 0;
-	for (int i=0; i<=17; i++)
-		for (int j=0; j <=17; j++)
-			gridVisited[i][j] = 0;
-	score0 = 0;
-	score1 = 0;
-	score2 = 0;
-	score3 = 0;
+		died = 0;
+		g_xpos = 300;
+		g_ypos = 300;
+		g2_xpos = 320;
+		g2_ypos = 300;
+		mhz1_ctr = 0;
+		tgl_gdir = 0;
     end
 
 	//Movement clock
@@ -73,87 +67,60 @@ module displaytop(
 	end
 
     always @ (posedge mhz1_clk) begin
-        if (btnS) begin
+        if (btnS || died) begin
             xpos = 50;
             ypos = 50;
+			g_xpos = 300;
+			g_ypos = 300;
+			g2_xpos = 320;
+			g2_ypos = 300;
+			died = 0;
         end
+		else if ((xpos == g_xpos && ypos == g_ypos) || (xpos == g2_xpos && ypos == g2_ypos))
+			died = 1;
         else begin
 			if (btnU) begin
-				if (ypos - 20 > 45)
-					ypos = ypos - 20;
-				if (gridVisited[xpos][ypos] == 0)
-				begin
-					gridVisited[xpos][ypos] = 1;
-					score0++;
-				end
-
+				if (ypos - 1 > 45)
+					ypos = ypos - 10;
 			end
 			else if (btnD) begin
-				if (ypos + 20 < 395)
-					ypos = ypos + 20;
-				if (gridVisited[xpos][ypos] == 0)
-				begin
-					gridVisited[xpos][ypos] = 1;
-					score0++;
-				end
+				if (ypos + 1 < 395)
+					ypos = ypos + 10;
 			end
 			else if (btnL) begin
-				if (xpos - 20 > 45)
-					xpos = xpos - 20;
-				if (gridVisited[xpos][ypos] == 0)
-				begin
-					gridVisited[xpos][ypos] = 1;
-					score0++;
-				end
+				if (xpos - 1 > 45)
+					xpos = xpos - 10;
 			end
 			else if (btnR) begin
-				if (xpos + 20 < 395)
-					xpos = xpos + 20;
-				if (gridVisited[xpos][ypos] == 0)
-				begin
-					gridVisited[xpos][ypos] = 1;
-					score0++;
-				end
+				if (xpos + 1 < 395)
+					xpos = xpos + 10;
 			end
-	if (score0 == 10)
-	begin
-		if (score1 == 9 && score2 == 9 && score3 == 9)
-			score0 = 9;
-		else begin
-			score0 = 0;
-			score1++;
-		end
-	end
-	if (score1 == 10)
-	begin
-		if (score2 == 9 && score3 == 9)
-			score1 = 9;
-		else begin
-			score1 = 0;
-			score2++;
-		end
-	end
-	if (score2 == 10)
-	begin
-		if (score3 == 9)
-			score2 = 9;
-		else begin
-			score2 = 0;
-			score3++;
-		end
-	end
-	if (score3 == 10)
-	begin
-		score3 = 9;
-	end
 
-	score_0 = score0;
-	score_1 = score1;
-	score_2 = score2;
-	score_3 = score3;
+			if (!tgl_gdir) begin
+				if (xpos < g_xpos && g_xpos - 1 > 45)
+					g_xpos = g_xpos - 10;
+				else if (g_xpos + 1 < 395)
+					g_xpos = g_xpos + 10;
+			end
+			else begin
+				if (ypos < g_ypos && g_ypos - 1 > 45)
+					g_ypos = g_ypos - 10;
+				else if (g_ypos + 1 < 395)
+					g_ypos = g_ypos + 10;
+			end
+
+			if (xpos < g2_xpos && g2_xpos - 1 > 45)
+				g2_xpos = g2_xpos - 10;
+			else if (ypos < g2_ypos && g2_ypos - 1 > 45)
+				g2_ypos = g2_ypos - 10;
+			else if (g2_xpos + 1 < 395)
+				g2_xpos = g2_xpos + 10;
+			else if (g2_ypos + 1 < 395)
+				g2_ypos = g2_ypos + 10;
+
+			tgl_gdir = ~ tgl_gdir;
         end
     end
-
 
 
 	//Ghost Movement Handler
@@ -173,13 +140,15 @@ module displaytop(
     assign sq_d = ((x > 320) & (y > 280) & (x < 420) & (y < 420)) ? 1 : 0;*/
 
 	assign pacman = ((x < xpos + 6) & (x > xpos - 6) & (y < ypos + 6) & (y > ypos - 6)) ? 1 : 0;
+	assign ghost = ((x < g_xpos + 6) & (x > g_xpos - 6) & (y < g_ypos + 6) & (y > g_ypos - 6)) ? 1 : 0;
+	assign ghost2 = ((x < g2_xpos + 6) & (x > g2_xpos - 6) & (y < g2_ypos + 6) & (y > g2_ypos - 6)) ? 1 : 0;
 
-    assign vgaRed[2:2] = pacman;
-	assign vgaRed[1:1] = pacman;
-	assign vgaRed[0:0] = pacman;
-    assign vgaGreen[2] = 0;
-	assign vgaGreen[1] = 0;
-	assign vgaGreen[0] = 0;
+    assign vgaRed[2:2] = pacman | ghost2;
+	assign vgaRed[1:1] = pacman | ghost2;
+	assign vgaRed[0:0] = pacman | ghost2;
+    assign vgaGreen[2] = ghost | ghost2;
+	assign vgaGreen[1] = ghost | ghost2;
+	assign vgaGreen[0] = ghost | ghost2;
 	assign vgaBlue[1:1] = grid | box1 | box2 | box3 | box4;
 	assign vgaBlue[0:0] = grid | box1 | box2 | box3 | box4;
 endmodule
